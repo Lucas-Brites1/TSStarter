@@ -22,4 +22,5 @@ class ConfigManager {
 
 }
 
-export { ConfigManager };
+const configManager = new ConfigManager();
+export { configManager };

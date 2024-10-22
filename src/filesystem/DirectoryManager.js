@@ -51,6 +51,8 @@ class DirectoryManager {
     this.#addNewFile(this.paths.get("src"), "index.ts");
     this.#addNewDirectory(projectPath, "dist"); 
     this.#addNewFile(projectPath, ".env");
+    this.#addNewFile(projectPath, ".gitignore");
+    fs.writeFileSync(this.#join(projectPath, ".gitignore"), "node_modules/", "utf-8")
   }
 
   #handleAdditionalDirs(listOfDirs) {
