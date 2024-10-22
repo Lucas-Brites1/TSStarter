@@ -6,7 +6,9 @@ class DependenciesManager {
   #presets = {
     "api-express": {
       prod: ["dotenv", "express", "axios"],
-      dev: ["typescript", "ts-node", "@types/node", "@types/express"]
+      dev: [
+            "typescript", "ts-node", "@types/node", "@types/express"
+          ]
     },
     "api-cache": {
       prod: ["redis"],

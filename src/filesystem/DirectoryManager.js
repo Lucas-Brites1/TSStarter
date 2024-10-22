@@ -1,7 +1,10 @@
 import path from "node:path";
 import fs from "node:fs";
+import { Installer } from "../scripts/installer.js";
 
 class DirectoryManager {
+  #text = new Installer();
+  
   constructor(projectName, additionalDirs) {
     this.paths = new Map();
     this.#createDefaultPaths(projectName);
@@ -10,26 +13,35 @@ class DirectoryManager {
     if (additionalDirs) this.#handleAdditionalDirs(additionalDirs);
   }
 
-  #addNewDirectory(parent, newDirectoryName) {
-    const fullPath = this.#join(parent, newDirectoryName);  
-
-    try {
-      if (!fs.existsSync(fullPath)) {
-        fs.mkdirSync(fullPath, { recursive: true });
-        this.paths.set(newDirectoryName, fullPath); 
-        console.log(`Directory created: ${fullPath}`);
-      } else {
-        console.log(`Directory already exists: ${fullPath}`);
-      }
-    } catch (error) {
-      console.error(`Error trying to add new directory: ${fullPath}`, error);
-    }
-  }
-
   #join(pD, newD) {
     return path.join(pD, newD);  
   }
 
+  #addNewDirectory(parent, newDirectoryName) {
+    const fullPath = this.#join(parent, newDirectoryName);  
+    try {
+      if (!fs.existsSync(fullPath)) {
+        fs.mkdirSync(fullPath, { recursive: true });
+        this.paths.set(newDirectoryName, fullPath); 
+        this.#text.consoleTextColor(`Directory created: ${fullPath}`, "green", "bold");
+      } else {
+        this.#text.consoleTextColor(`Warning: Directory already exists: ${fullPath}`, "yellow", "italic");
+      }
+    } catch (error) {
+      this.#text.consoleTextColor(`Error creating directory: ${fullPath}`, "red", "bold");
+    }
+  }
+
+  #addNewFile(PathToAdd, fileName) {
+    try {
+      fs.writeFileSync(this.#join(PathToAdd, fileName), "", "utf-8");
+      this.#text.consoleTextColor(`File created: ${this.#join(PathToAdd, fileName)}`, "blue", "italic");
+    } catch (error) {
+      this.#text.consoleTextColor(`Error creating file: ${fileName}`, "red", "bold");
+      return;
+    }
+  }
+  
   #createDefaultPaths(projectName) {
     const projectPath = path.join(process.cwd(), projectName);
     this.paths.set(projectName, projectPath); 
@@ -39,16 +51,6 @@ class DirectoryManager {
     this.#addNewFile(this.paths.get("src"), "index.ts");
     this.#addNewDirectory(projectPath, "dist"); 
     this.#addNewFile(projectPath, ".env");
-  }
-
-  #addNewFile(PathToAdd, fileName) {
-    try {
-      fs.writeFileSync(this.#join(PathToAdd, fileName), "", "utf-8");
-      console.log(`File created: ${this.#join(PathToAdd, fileName)}`);
-    } catch (error) {
-      console.error("Error trying to create new file: ", error);
-      return;
-    }
   }
 
   #handleAdditionalDirs(listOfDirs) {
@@ -72,6 +74,24 @@ class DirectoryManager {
     return result;
   }
 
+  #handleSubDirs(main, subdirs) {
+    let folderPath;
+    for(let i = 0; i < subdirs.length; i++) {
+      if (subdirs[i].includes(".")) {
+        if (folderPath) {
+          this.#text.consoleTextColor(`Creating file: ${subdirs[i]} in ${folderPath}`, "cyan", "italic");
+          this.#addNewFile(folderPath, subdirs[i]);
+        } else {
+          this.#text.consoleTextColor(`Creating file: ${subdirs[i]} in ${main}`, "cyan", "italic");
+          this.#addNewFile(main, subdirs[i]);
+        }
+      } else {
+        this.#addNewDirectory(main, subdirs[i]);
+        folderPath = this.paths.get(subdirs[i]);
+      }
+    }
+  }
+
   #createNestedStructure(arrayDirs) {
     for(let i = 0; i < arrayDirs.length; i++) {
       const current = arrayDirs[i];
@@ -86,24 +106,6 @@ class DirectoryManager {
         } else {
           this.#addNewDirectory(this.paths.get("src"), current[0]);
         }
-      }
-    }
-  }
-
-  #handleSubDirs(main, subdirs) {
-    let folderPath;
-    for(let i = 0; i < subdirs.length; i++) {
-      if (subdirs[i].includes(".")) {
-        if (folderPath) {
-          console.log(`Creating file: ${subdirs[i]} in ${folderPath}!`);
-          this.#addNewFile(folderPath, subdirs[i]);
-        } else {
-          console.log(`Creating file: ${subdirs[i]} in ${main}`);
-          this.#addNewFile(main, subdirs[i]);
-        }
-      } else {
-        this.#addNewDirectory(main, subdirs[i]);
-        folderPath = this.paths.get(subdirs[i]);
       }
     }
   }

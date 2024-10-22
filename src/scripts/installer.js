@@ -5,21 +5,30 @@ class Installer {
   spinner;
 
   showText() {
+    console.log("\n")
     this.spinner = ora(`${chalk.green.bold(`Installing`)}`).start(); 
+    this.spinner.color = 'green';
+
     let dots = "";
     const interval = setInterval(() => {
-      this.spinner.color = 'green';
       this.spinner.text = `${chalk.green.bold(`Installing`)}${chalk.green.italic(dots)}`; 
       dots += ".";
       if (dots.length > 3) {
         dots = ""; 
       }
-    }, 275); 
+    }, 400); 
+
     return interval;
   }
 
   succeed(message) {
-    this.spinner.succeed(`${chalk.green.bold.italic(message)}`);
+    if (this.spinner) {
+      this.spinner.succeed(`${chalk.green.bold.italic(message)}`);
+    }
+  }
+
+  consoleTextColor(text, color, type) {
+      console.log(chalk[color][type](text));
   }
 }
 

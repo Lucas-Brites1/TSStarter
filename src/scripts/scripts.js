@@ -8,7 +8,10 @@ const addScriptsToPackageJson = (PATH, SCRIPTS) => {
       ...configs.scripts,
       ...SCRIPTS 
     };
+    setDefaultValues(configs); 
+
     fs.writeFileSync(PATH, JSON.stringify(configs, null, 2));
+
     return true;
   } catch (err) {
     console.error("Error modifying package.json:", err);
@@ -16,4 +19,14 @@ const addScriptsToPackageJson = (PATH, SCRIPTS) => {
   }
 };
 
-export { addScriptsToPackageJson }; 
+function setDefaultValues(configs) {
+  const defaultValues = {
+    main: "dist/index.js",
+  };
+
+  for (const [key, value] of Object.entries(defaultValues)) {
+      configs[key] = value;
+  }
+}
+
+export { addScriptsToPackageJson };

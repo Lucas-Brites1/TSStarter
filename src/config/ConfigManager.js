@@ -2,7 +2,7 @@ class ConfigManager {
   packageJsonConfig = {
     build: "tsc",
     dev: "ts-node ./src/index.ts",
-    start: "node ./dist/index.js"
+    start: "node ./dist/index.js",
   };
 
   tsconfigJSONConfig = {
@@ -19,6 +19,7 @@ class ConfigManager {
     include: ["src/**/*"],
     exclude: ["node_modules", "dist"]
   };
+
 }
 
-export { ConfigManager }; 
+export { ConfigManager };
