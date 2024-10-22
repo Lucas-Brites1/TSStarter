@@ -36,6 +36,7 @@ class DirectoryManager {
 
     this.#addNewDirectory(process.cwd(), projectName);  
     this.#addNewDirectory(projectPath, "src");  
+    this.#addNewFile(this.paths.get("src"), "index.ts");
     this.#addNewDirectory(projectPath, "dist"); 
     this.#addNewFile(projectPath, ".env");
   }
